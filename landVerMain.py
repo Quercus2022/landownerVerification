@@ -131,7 +131,7 @@ for p in range(1, ws1.max_row):
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    # Beacon will recognize a script is running and block IP from accessing info.
+    # GIS website will recognize a script is running and block IP from accessing info.
     test = soup.find('p')
     if test is not None:  # There are no </p> tags on the page I'm interested in. If there is a 'p' tag then the scrapper has been redirected to an error page.
         print('Beacon has shut down scraper. Change IP.')
@@ -153,4 +153,5 @@ for p in range(1, ws1.max_row):
 wb1.save('countyX.xlsx')
 print('Done')
 
-# If the scraper gets shutdown midway through and excel sheet, copy unhighlighted rows to a new file and run the program again using the new spreadsheet
+# If the scraper gets shutdown midway through an excel sheet, copy unhighlighted rows to a new file, save countyX.xlsx with a more descriptive name,
+# and run the program again using the new spreadsheet. If you do not same countyX.xlsx under a different name it will be replaced by the output of the most recent run.
