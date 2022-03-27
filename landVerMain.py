@@ -9,7 +9,7 @@ import re
 
 # gets a list of last names from database Excel
 def getLastNameList(wsName):
-    x = 1
+    x = 1  # Setting x = 1 ensures the loop starts on the 2nd Excel row. Excel row 1 is the column labels/headers.
     cells = []
     for i in wsName:
         cell = wsName.cell(row=x, column=6).value
@@ -31,7 +31,7 @@ def getAddressLst(wsAdr):
     return cells
 
 
-# get list of parcel IDs for database Excel
+# get list of parcel IDs from database Excel
 def getPID(ws):
     x = 1
     cells = []
@@ -43,7 +43,7 @@ def getPID(ws):
     return cells
 
 
-# extracts for webpage a string with deeded landowners full names including trusts if present
+# extracts from webpage a string with deeded landowners full names including trusts if present
 def extractOwner(stew):
     # id is different depending on whether landowner name is a
     # link or not. Only  char difference so a regular expression
@@ -64,15 +64,11 @@ def extractAddress(stew):
         ad4 = 'none'
     else:
         myTag = tdLst.find_all('br')
-        # replace br with space
-        myTag[1].replace_with(' ')
-        # extract only the text from selected html
-        ad1 = tdLst.text
-        # split the text into address1(street address) and address2(city)
-        ad2 = re.split(r'\w*,\s', ad1)
-        ad3 = ad2[0].strip()  # selects street address and strips whitespace
-        # removes all spaces from string for easier comparison
-        ad4 = ad3.replace(' ', '')
+        myTag[1].replace_with(' ')  # replace br with space       
+        ad1 = tdLst.text  # extract only the text from selected html        
+        ad2 = re.split(r'\w*,\s', ad1)  # split the text into address1(street address) and address2(city)
+        ad3 = ad2[0].strip()  # selects street address and strips whitespace        
+        ad4 = ad3.replace(' ', '')  # removes all spaces from string for easier comparison
     return ad4
 
 
@@ -87,10 +83,8 @@ def lastNameCheck(a, b, c):
 
 
 # checks if address from webpage matches the one in Excel, returns a Boolean
-def addressCheck(a, b, c):
-    # remove all spaces from string for easier comparison
-    adLst = b[c].replace(' ', '')
-    # if a == adLst:  # Exact address match
+def addressCheck(a, b, c):    
+    adLst = b[c].replace(' ', '')  # remove all spaces from string for easier comparison
     if a in adLst:  # Is the database address found anywhere in the website address.
         return True
     else:
@@ -117,7 +111,7 @@ def checkOutput(own, add, ws, i):
 ########################################################################################
 
 
-xlFile = input('Enter .xlsx file to open: ')  # reference workbook
+xlFile = input('Enter .xlsx file to open: ')  # reference workbook obbtained from our database
 try:
     wb1 = openpyxl.load_workbook(xlFile)  # open workbook
     ws1 = wb1['Sheet1']  # active sheet of database workbook
@@ -137,13 +131,14 @@ for p in range(1, ws1.max_row):
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
 
+    # Beacon will recognize a script is running and block IP from accessing info.
     test = soup.find('p')
-    if test is not None:
+    if test is not None:  # There are no </p> tags on the page I'm interested in. If there is a 'p' tag then the scrapper has been redirected to an error page.
         print('Beacon has shut down scraper. Change IP.')
-        quit()
+        quit()  # If program doesn't quit it will mark all remaining Excel lines red.
 
     owner = extractOwner(soup).split()[0]  # extracts deeded owners name from HTML, splits the string into component
-    # words, and assigns the one at index[0], their last name, to 'owner'.
+    # words, and assigns the one at index[0], their last name or the name of a business or trust, to 'owner'.
 
     # extracts deeded owners mailing address from HTML, and splits at the end of street address.
     address = extractAddress(soup)
@@ -153,7 +148,9 @@ for p in range(1, ws1.max_row):
 
     checkOutput(lnCheck, adCheck, ws1, p)
 
-    wb1.save('johnsonX.xlsx')
+    wb1.save('countyX.xlsx')  # Saves changes (row color highlights) to new file.
 
-wb1.save('johnsonX.xlsx')
+wb1.save('countyX.xlsx')
 print('Done')
+
+# If the scraper gets shutdown midway through and excel sheet, copy unhighlighted rows to a new file and run the program again using the new spreadsheet
