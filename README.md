@@ -7,5 +7,7 @@ The goal of this project is to create a program that will:
    from database spreadsheet to new file for manual lookup
 ---------------------------------------------------------------------------------------------------------------
 I decided to keep things simple and instead of copying the landowner information to a new file it highlights erronious rows in red and rows with correct info in green, then saves the output as a new file.
+
 Formatting differences between our datatbase and how deed landowners are recorded on the Beacon website lead to a significant number of false negatives (indicating that land ownership or mailing address had changed when it hadn't).
+
 However, I haven't found a single false positive yet. That means that the program as is can still be a useful tool when doing landowner verification as you can trust that the green rows are verified. This cuts down on how many property records you need to investigate.
